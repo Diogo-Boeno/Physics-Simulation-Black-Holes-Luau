@@ -1,3 +1,4 @@
+--Physics.client.luau
 local RunService        = game:GetService("RunService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Config            = require(ReplicatedStorage.Modules.StarConfig)
@@ -85,6 +86,24 @@ local function computeAccelerations()
         end
     end
 
+    -- ── Confinamento ──────────────────────────────────────────
+    local confRadius = Config.ConfinementRadius
+    local confForce  = Config.ConfinementForce
+
+    for i, star in ipairs(stars) do
+        -- Só considera X e Z (não prende verticalmente)
+        local pos  = star.Part.Position
+        local flat = Vector3.new(pos.X, 0, pos.Z)
+        local dist = flat.Magnitude
+
+        if dist > confRadius then
+            -- Força proporcional ao quanto passou do limite
+            local excess    = dist - confRadius
+            local direction = -flat.Unit  -- aponta para o centro
+            accels[i]      += direction * confForce * excess
+        end
+    end
+
     return accels
 end
 
@@ -137,21 +156,29 @@ local function circularOrbitVelocity(newPos, newMass)
 end
 
 -- ── Receber estrela ───────────────────────────────────────
-AddStarToClient.OnClientEvent:Connect(function(id, partName, mass)
+AddStarToClient.OnClientEvent:Connect(function(id, partName, mass, bodyType, initVel)
     local part = Folder:WaitForChild(partName, 5)
     if not part then
         warn("[Física] Part não encontrado:", partName)
         return
     end
 
-    local vel = circularOrbitVelocity(part.Position, mass)
+    local vel
+    if initVel and initVel.Magnitude > 0.01 then
+        -- Static (zero) ou Custom (valor do usuário)
+        vel = initVel
+    else
+        -- Orbital → calcula velocidade circular
+        vel = circularOrbitVelocity(part.Position, mass)
+    end
 
     table.insert(stars, {
-        Id      = id,
-        Part    = part,
-        Mass    = mass,
-        Vel     = vel,
-        HalfVel = vel,
+        Id       = id,
+        Part     = part,
+        Mass     = mass,
+        BodyType = bodyType or "Star",
+        Vel      = vel,
+        HalfVel  = vel,
     })
 end)
 

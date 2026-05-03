@@ -1,3 +1,4 @@
+--SpaceTimeGrid.client.luau
 local RunService        = game:GetService("RunService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Config            = require(ReplicatedStorage.Modules.StarConfig)
