@@ -1,34 +1,39 @@
 local Star = {}
 Star.__index = Star
 
-local Properties = {
-    Path = workspace,
-    Name = 'Star',
-    PartType = Enum.PartType.Ball,
-
-    Anchored = true,
-
-    Color = BrickColor.new('White'),
-    Size = Vector3.new(10, 10, 10),
-    CFrame = CFrame.new(10, 10, 0),
-    Material = Enum.Material.SmoothPlastic
-}
-
-function Star.new()
+function Star.new(model, mass)
     local self = setmetatable({}, Star)
-    local p = Properties
 
-    self.Model = Instance.new('Part')
-    self.Model.Parent = p.Path
-    self.Model.Name = p.Name
-    self.Model.Shape = p.PartType
-    self.Model.Size = p.Size
-    self.Model.CFrame = p.CFrame
-    self.Model.BrickColor = p.Color
-    self.Model.Anchored = p.Anchored
-    self.Model.Material = p.Material
+    self.Model = model
+    self.Mass = mass
+    self.Vel = Vector3.zero
 
     return self
+end
+
+function Star:ApplyGravity(other, dt)
+    if not self.Model or not other.Model then return end
+
+    local p1 = self.Model.Position
+    local p2 = other.Model.Position
+
+    local r = p2 - p1
+    local dist = r.Magnitude
+    if dist < 1 then return end
+
+    local dir = r.Unit
+    local G = 1
+
+    local force = G * (self.Mass * other.Mass) / (dist * dist)
+    local accel = dir * (force / self.Mass)
+
+    self.Vel += accel * dt
+end
+
+function Star:Update(dt)
+    if not self.Model then return end
+    self.Model.CFrame = self.Model.CFrame + (self.Vel * dt)
+    print("Movendo estrela", self.Model.Position)
 end
 
 return Star
