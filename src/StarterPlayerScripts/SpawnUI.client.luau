@@ -28,7 +28,7 @@ local movButtons = {
 local customPanel = spawnerBg:WaitForChild("CustomMovementAdjuster")
 local spawnBtn = spawnerBg:WaitForChild("Spawn")
 
--- ── Estado Atual ───────────────────────────────────────────
+-- Estado Atual  
 local state = {
     bodyType = "BlackHole",
     size = 4,
@@ -37,13 +37,11 @@ local state = {
 }
 
 -- ── Lógica de Sliders Reutilizável ──────────────────────────
--- Esta função assume que dentro do Frame do slider existem: 
--- Um "Knob" (botão), um "Track" (fundo) e um "Label" (texto).
 local function setupSlider(sliderFrame, labelName, minVal, maxVal, default, onChange)
     local track = sliderFrame:WaitForChild("Track")
-    local knob  = track:WaitForChild("Knob")
-    local fill  = track:WaitForChild("Fill")
-    local title = sliderFrame:WaitForChild("Label") -- Onde exibe o nome e valor
+    local knob = track:WaitForChild("Knob")
+    local fill = track:WaitForChild("Fill")
+    local title = sliderFrame:WaitForChild("Label")
 
     local dragging = false
     local function update(absX)
@@ -74,16 +72,16 @@ local function setupSlider(sliderFrame, labelName, minVal, maxVal, default, onCh
     update(track.AbsolutePosition.X + (track.AbsoluteSize.X * ((default - minVal)/(maxVal - minVal))))
 end
 
--- ── Configuração de Sliders ────────────────────────────────
-setupSlider(spawnerBg.SizeAdjustBg, "Tamanho", 2, 20, state.size, function(v)
+-- Configuração de Sliders 
+setupSlider(spawnerBg.SizeAdjustBg, "Size", 2, 20, state.size, function(v)
     state.size = v
 end)
 
-setupSlider(spawnerBg.MassAdjustBg, "Massa (k)", 1, 500, 150, function(v)
+setupSlider(spawnerBg.MassAdjustBg, "Mass (k)", 1, 500, 150, function(v)
     state.mass = v * 1000
 end)
 
--- ── Seleção de Tipo e Movimento ──────────────────────────────
+-- Seleção de Tipo e Movimento  
 local function updateSelectionVisuals(group, selectedId)
     for id, btn in pairs(group) do
         local isSelected = (id == selectedId)
@@ -101,7 +99,7 @@ for id, btn in pairs(typeButtons) do
         -- Ajuste automático de massa/tamanho baseado no Config
         local tc = Config.Types[id]
         if tc then
-            -- Aqui você poderia disparar um evento para resetar os sliders se quisesse
+            -- evento para resetar os sliders
         end
     end)
 end
@@ -115,7 +113,7 @@ for id, btn in pairs(movButtons) do
     end)
 end
 
--- ── Botão Spawn ────────────────────────────────────────────
+-- Spawn
 spawnBtn.MouseButton1Click:Connect(function()
     local vel = Vector3.zero
 
@@ -142,6 +140,5 @@ spawnBtn.MouseButton1Click:Connect(function()
     end)
 end)
 
--- Inicialização visual
 updateSelectionVisuals(typeButtons, state.bodyType)
 updateSelectionVisuals(movButtons, state.movement)
