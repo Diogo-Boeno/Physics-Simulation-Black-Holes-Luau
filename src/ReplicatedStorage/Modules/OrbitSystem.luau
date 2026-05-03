@@ -1,4 +1,3 @@
---OrbitSystem.luau
 local Star = require(game.ReplicatedStorage.Modules.Star)
 
 local OrbitSystem = {}
@@ -7,7 +6,7 @@ OrbitSystem.Stars = {}
 function OrbitSystem.AddStar(model, mass)
     local s = Star.new(model, mass)
     table.insert(OrbitSystem.Stars, s)
-    print('orbitSystem: estrela adicionada', #OrbitSystem.Stars)
+    print('estrela adicionada', #OrbitSystem.Stars)
 end
 
 function OrbitSystem.Update(dt)
